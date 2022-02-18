@@ -15,21 +15,25 @@ import (
 	"os"
 )
 
-var only_sum bool // whether -s option is active
+var only_sum bool  // -s option
+var print_tot bool // -c option
 
 func count_files(currPath string, depth int) int64 {
 	var count int64
 
-	stat, _ := os.Lstat(currPath)
-	switch mode := stat.Mode(); {
+	stat, err := os.Lstat(currPath)
+	if err != nil {
+		fmt.Println(err)
+		return count
+	}
 
+	switch mode := stat.Mode(); {
 	case mode.IsDir():
 		files, err := os.ReadDir(currPath)
 		if err != nil {
 			fmt.Println(err)
 			return count
 		}
-
 		for _, file := range files {
 			if file.IsDir() {
 				count += count_files(fmt.Sprintf("%s/%s", currPath, file.Name()), depth+1)
@@ -50,15 +54,21 @@ func count_files(currPath string, depth int) int64 {
 
 func main() {
 	var dir string
+	var tot int64
 
-	flag.BoolVar(&only_sum, "s", false, "display only a total for each argument")
+	flag.BoolVar(&only_sum, "s", false, "print only a total for each argument")
+	flag.BoolVar(&print_tot, "c", false, "print grand total")
 	flag.Parse()
 	if flag.NArg() > 0 {
 		for _, dir = range flag.Args() {
-			count_files(dir, 0)
+			tot += count_files(dir, 0)
 		}
 	} else {
 		dir = "."
-		count_files(dir, 0)
+		tot = count_files(dir, 0)
+	}
+
+	if print_tot {
+		fmt.Printf("%d\t%s\n", tot, "total")
 	}
 }
