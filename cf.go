@@ -12,6 +12,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"path"
 	"os"
 )
 
@@ -47,7 +48,7 @@ func count_files(currPath string, depth int) int64 {
 	}
 
 	if only_sum == false || (only_sum == true && depth == 0) {
-		fmt.Printf("%d\t%s\n", count, currPath)
+		fmt.Printf("%d\t%s\n", count, path.Clean(currPath))
 	}
 	return count
 }
