@@ -1,7 +1,7 @@
 // CF -- count files in directories and subdirectories (like du(1) but
 // for counting files rather than file sizes)
 //
-// SvM 30-JAN-2021 - 11-MAR-2021
+// SvM 30-JAN-2021 - 21-JAN-2022
 //
 // created from https://raw.githubusercontent.com/missedone/dugo/master/du.go
 // and https://golang.org/pkg/os/#Stat by chipping away anrything we
@@ -12,12 +12,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"path"
 	"os"
+	"path"
 )
 
 var only_sum bool  // -s option
 var print_tot bool // -c option
+var print_sep bool // -S option
 
 func count_files(currPath string, depth int) int64 {
 	var count int64
@@ -50,7 +51,11 @@ func count_files(currPath string, depth int) int64 {
 	if only_sum == false || (only_sum == true && depth == 0) {
 		fmt.Printf("%d\t%s\n", count, path.Clean(currPath))
 	}
-	return count
+	if print_sep {
+		return 0
+	} else {
+		return count
+	}
 }
 
 func main() {
@@ -59,6 +64,7 @@ func main() {
 
 	flag.BoolVar(&only_sum, "s", false, "print only a total for each argument")
 	flag.BoolVar(&print_tot, "c", false, "print grand total")
+	flag.BoolVar(&print_sep, "S", false, "don't add subdirectories to directory counts")
 	flag.Parse()
 	if flag.NArg() > 0 {
 		for _, dir = range flag.Args() {

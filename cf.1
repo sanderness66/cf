@@ -1,0 +1,39 @@
+.TH cf 1 21-JAN-2022 GO
+
+.SH NAME
+cf \- count files in given directories and subdirectories
+
+.SH SYNOPSIS
+.B cf
+[-s] [-c] [-S] [dir ...]
+
+.SH DESCRIPTION
+.B cf
+counts the number of files in the given directories (or the current
+directory if no argument is given), and all its subdirectories. Bit like
+.BR du (1)
+but for file counts, rather than file sizes.
+.B cf
+only counts regular files, not directories, symbolic links, device
+files or named pipes.
+
+.B cf
+has these options:
+
+.TP
+.B \-s
+print only a total file count for each argument
+
+.TP
+.B \-c
+print a grand total
+
+.TP
+.B \-S
+don't add subdirectory counts to directory count
+
+.SH SEE ALSO
+.BR du (1)
+
+.SH OWNER
+svm
