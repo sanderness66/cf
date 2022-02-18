@@ -1,15 +1,11 @@
 // CF -- count files in directories and subdirectories (like du(1) but
 // for counting files rather than file sizes)
 //
-// SvM 30-JAN-2021 - 03-FEB-2021
+// SvM 30-JAN-2021 - 11-MAR-2021
 //
 // created from https://raw.githubusercontent.com/missedone/dugo/master/du.go
 // and https://golang.org/pkg/os/#Stat by chipping away anrything we
 // don't need
-
-// So, do we want to count a) only files, b) everything that isn't a
-// directory, or c) everything including directories? We seem to have
-// ended up doing b), but a) or c) is probably more useful.
 
 package main
 
@@ -24,30 +20,26 @@ var only_sum bool // whether -s option is active
 func count_files(currPath string, depth int) int64 {
 	var count int64
 
-	dir, err := os.Open(currPath)
-	if err != nil {
-		fmt.Println(err)
-		return 0 // although there's a case for return 1, since it probably does exist
-	}
-	defer dir.Close()
-
-	stat, err := os.Stat(currPath)
+	stat, _ := os.Lstat(currPath)
 	switch mode := stat.Mode(); {
+
 	case mode.IsDir():
-		files, err := dir.Readdir(-1)
+		files, err := os.ReadDir(currPath)
 		if err != nil {
 			fmt.Println(err)
-		} else {
-			for _, file := range files {
-				if file.IsDir() {
-					count += count_files(fmt.Sprintf("%s/%s", currPath, file.Name()), depth+1)
-				} else {
-					count++
-				}
+			return count
+		}
+
+		for _, file := range files {
+			if file.IsDir() {
+				count += count_files(fmt.Sprintf("%s/%s", currPath, file.Name()), depth+1)
+			} else if file.Type().IsRegular() {
+				count++
 			}
 		}
-	default:
-		count = 1
+
+	case mode.IsRegular():
+		count++
 	}
 
 	if only_sum == false || (only_sum == true && depth == 0) {
