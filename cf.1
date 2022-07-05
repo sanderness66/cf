@@ -1,11 +1,11 @@
-.TH cf 1 21-JAN-2022 "Kozmix Go"
+.TH cf 1 05-JUL-2022 "Kozmix Go"
 
 .SH NAME
 cf \- count files in given directories and subdirectories
 
 .SH SYNOPSIS
 .B cf
-[-s] [-c] [-S] [dir ...]
+[-a] [-s] [-c] [-S] [dir ...]
 
 .SH DESCRIPTION
 .B cf
@@ -19,6 +19,10 @@ files or named pipes.
 
 .B cf
 has these options:
+
+.TP
+.B \-a
+do not ignore entries starting with .
 
 .TP
 .B \-s
@@ -38,7 +42,8 @@ don't add subdirectory counts to directory count
 doesn't work as expected.
 
 .SH SEE ALSO
-.BR du (1)
+.BR du (1),
+.BR ls (1)
 
 .SH AUTHOR
 svm

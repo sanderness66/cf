@@ -1,7 +1,7 @@
 // CF -- count files in directories and subdirectories (like du(1) but
 // for counting files rather than file sizes)
 //
-// SvM 30-JAN-2021 - 21-JAN-2022
+// SvM 30-JAN-2021 - 05-JUL-2022
 //
 // created from https://raw.githubusercontent.com/missedone/dugo/master/du.go
 // and https://golang.org/pkg/os/#Stat by chipping away anrything we
@@ -19,6 +19,7 @@ import (
 var only_sum bool  // -s option
 var print_tot bool // -c option
 var print_sep bool // -S option
+var also_dots bool // -a option
 
 func count_files(currPath string, depth int) int64 {
 	var count int64
@@ -40,11 +41,16 @@ func count_files(currPath string, depth int) int64 {
 			if file.IsDir() {
 				count += count_files(fmt.Sprintf("%s/%s", currPath, file.Name()), depth+1)
 			} else if file.Type().IsRegular() {
-				count++
+				if also_dots == true || file.Name()[0] != '.' {
+					// println(file.Name())
+					count++
+				}
 			}
 		}
 
 	case mode.IsRegular():
+		// no need to add also_dots logic because we only get
+		// here when currPath was specified on command line??
 		count++
 	}
 
@@ -65,6 +71,7 @@ func main() {
 	flag.BoolVar(&only_sum, "s", false, "print only a total for each argument")
 	flag.BoolVar(&print_tot, "c", false, "print grand total")
 	flag.BoolVar(&print_sep, "S", false, "don't add subdirectories to directory counts")
+	flag.BoolVar(&also_dots, "a", false, "do not ignore entries starting with .")
 	flag.Parse()
 	if flag.NArg() > 0 {
 		for _, dir = range flag.Args() {
